@@ -32,11 +32,6 @@ export class CreateUserDto {
   @IsString()
   avatarPath?: string;
 
-  @ApiProperty({ description: 'User role ID' })
-  @IsNotEmpty()
-  @IsUUID()
-  roleId: string;
-
   @ApiPropertyOptional({ description: 'Is user deleted?' })
   @IsOptional()
   @IsBoolean()

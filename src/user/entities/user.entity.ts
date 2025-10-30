@@ -14,7 +14,7 @@ export class User {
   id: string;
 
   @Column({ nullable: false })
-  name: string;
+  firstName: string;
 
   @Column({ nullable: false })
   lastName: string;
@@ -31,8 +31,8 @@ export class User {
   @Column({ nullable: true })
   avatarPath: string;
 
-  @Column({ name: 'rolID' })
-  roleId: string;
+  @Column({ nullable: true })
+  refreshToken: string;
 
   @Column({ nullable: false })
   isDeleted: boolean;
