@@ -1,5 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import { UserService } from '../user/user.service';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
@@ -9,6 +10,7 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   async login(loginDto: LoginDto) {
@@ -67,7 +69,7 @@ export class AuthService {
       role: user.role,
       type: 'access_token',
     };
-    return this.jwtService.signAsync(payload, { expiresIn: '15m' });
+    return this.jwtService.signAsync(payload);
   }
 
   private async generateRefreshToken(user: any) {
@@ -75,7 +77,10 @@ export class AuthService {
       sub: user.id,
       type: 'refresh_token',
     };
-    return this.jwtService.signAsync(payload, { expiresIn: '7d' });
+    return this.jwtService.signAsync(payload, {
+      secret: this.configService.get('JWT_REFRESH_SECRET'),
+      expiresIn: '7d',
+    });
   }
 
   async refreshAccessToken(userId: string, refreshToken: string) {

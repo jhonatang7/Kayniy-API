@@ -51,20 +51,19 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('profile')
+  @Get('me')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Obtener perfil del usuario' })
   @ApiResponse({
     status: 200,
     description: 'Retorna la información del usuario autenticado',
   })
-  getProfile(@Req() req: Request) {
+  getMe(@Req() req: Request) {
     return this.authService.getUserProfile(req.user['id']);
   }
 
-  @Post('refresh')
   @UseGuards(RefreshTokenGuard)
-  @ApiBearerAuth()
+  @Get('refresh')
   @ApiOperation({ summary: 'Refrescar access token' })
   @ApiResponse({
     status: 200,

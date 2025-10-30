@@ -5,14 +5,19 @@ import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
 
 @Injectable()
-export class RefreshTokenStrategy extends PassportStrategy(Strategy, 'refresh-jwt') {
+export class RefreshTokenStrategy extends PassportStrategy(
+  Strategy,
+  'refresh-jwt',
+) {
   constructor(private configService: ConfigService) {
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        (request) => {
-          return request?.cookies?.refresh_token;
-        },
-      ]),
+      jwtFromRequest: (req: Request) => {
+        if (!req || !req.cookies) {
+          return null;
+        }
+        const token = req.cookies['refresh_token'];
+        return token;
+      },
       secretOrKey: configService.get('JWT_REFRESH_SECRET'),
       passReqToCallback: true,
     });
@@ -22,6 +27,9 @@ export class RefreshTokenStrategy extends PassportStrategy(Strategy, 'refresh-jw
     if (payload.type !== 'refresh_token') {
       return false;
     }
-    return { id: payload.sub };
+    
+    const refresh_token = req.cookies['refresh_token'];
+    
+    return { id: payload.sub, refresh_token };
   }
 }
