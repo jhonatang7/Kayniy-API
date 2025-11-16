@@ -16,7 +16,6 @@ export class ModuleService {
     const module = this.moduleRepository.create({
       title: createModuleDto.title,
       description: createModuleDto.description,
-      course: { id: createModuleDto.courseId },
       community: { id: createModuleDto.communityId },
     });
 
@@ -26,6 +25,9 @@ export class ModuleService {
   async findAll(): Promise<Module[]> {
     return await this.moduleRepository.find({
       relations: ['course', 'community', 'lessons', 'quizzes', 'userProgress'],
+      order:{
+        title: "ASC"
+      }
     });
   }
 
@@ -44,10 +46,6 @@ export class ModuleService {
 
   async update(id: string, updateModuleDto: UpdateModuleDto): Promise<Module> {
     const module = await this.findOne(id);
-
-    if (updateModuleDto.courseId) {
-      module.course = { id: updateModuleDto.courseId } as any;
-    }
 
     if (updateModuleDto.communityId) {
       module.community = { id: updateModuleDto.communityId } as any;

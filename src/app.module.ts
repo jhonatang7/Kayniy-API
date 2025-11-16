@@ -19,6 +19,7 @@ import { UserQuizAttemptModule } from './user-quiz-attempt/user-quiz-attempt.mod
 import { RoleModule } from './role/role.module';
 import { PermissionModule } from './permission/permission.module';
 import { AuthModule } from './auth/auth.module';
+import { CommunityModule } from './community/community.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { AuthModule } from './auth/auth.module';
     RoleModule,
     PermissionModule,
     AuthModule,
+    CommunityModule,
   ],
   controllers: [AppController],
   providers: [AppService],

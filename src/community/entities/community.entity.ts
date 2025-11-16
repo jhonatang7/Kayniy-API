@@ -15,9 +15,6 @@ export class Community {
   @Column({ nullable: true })
   description: string;
 
-  @Column({ name: 'userID', nullable: true })
-  userId: string;
-
   @CreateDateColumn({ 
     name: 'registeredDate',
     type: 'timestamp',

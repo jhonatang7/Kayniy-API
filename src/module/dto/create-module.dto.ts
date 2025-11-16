@@ -12,11 +12,6 @@ export class CreateModuleDto {
   @IsString()
   description?: string;
 
-  @ApiProperty({ description: 'Course ID' })
-  @IsNotEmpty()
-  @IsUUID()
-  courseId: string;
-
   @ApiProperty({ description: 'Community ID' })
   @IsNotEmpty()
   @IsUUID()

@@ -61,7 +61,7 @@ export class User {
   @OneToMany(() => UserQuizAttempt, attempt => attempt.user)
   quizAttempts: UserQuizAttempt[];
 
-  @ManyToMany(() => Community)
+  @ManyToMany(() => Community, community => community.professors)
   @JoinTable({
     name: 'community_professors',
     joinColumn: {
@@ -75,7 +75,7 @@ export class User {
   })
   teachingCommunities: Community[];
 
-  @ManyToMany(() => Community)
+  @ManyToMany(() => Community, community => community.students)
   @JoinTable({
     name: 'community_students',
     joinColumn: {
