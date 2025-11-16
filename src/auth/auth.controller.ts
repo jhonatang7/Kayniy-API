@@ -95,4 +95,10 @@ export class AuthController {
     });
     return result;
   }
+
+  @Post('test')
+  @UseGuards(JwtAuthGuard)
+  async testButton(){
+    console.log("JHONATAN")
+  }
 }

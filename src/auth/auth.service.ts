@@ -79,7 +79,7 @@ export class AuthService {
     };
     return this.jwtService.signAsync(payload, {
       secret: this.configService.get('JWT_REFRESH_SECRET'),
-      expiresIn: '7d',
+      expiresIn: this.configService.get('JWT_REFRESH_EXPIRATION_TIME'),
     });
   }
 

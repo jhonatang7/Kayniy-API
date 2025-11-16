@@ -19,14 +19,14 @@ export class CommunityService {
 
   async findAll(): Promise<Community[]> {
     return await this.communityRepository.find({
-      relations: ['user', 'courses', 'modules', 'liveClasses'],
+      relations: ['professors', 'students', 'courses', 'modules', 'liveClasses'],
     });
   }
 
   async findOne(id: string): Promise<Community> {
     const community = await this.communityRepository.findOne({
       where: { id },
-      relations: ['user', 'courses', 'modules', 'liveClasses'],
+      relations: ['professors', 'students', 'courses', 'modules', 'liveClasses'],
     });
 
     if (!community) {

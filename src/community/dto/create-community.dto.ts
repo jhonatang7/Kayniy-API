@@ -11,9 +11,4 @@ export class CreateCommunityDto {
   @IsOptional()
   @IsString()
   description?: string;
-
-  @ApiPropertyOptional({ description: 'Creator user ID' })
-  @IsOptional()
-  @IsUUID()
-  userId?: string;
 }

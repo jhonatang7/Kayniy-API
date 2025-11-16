@@ -4,6 +4,7 @@ import { Community } from '../../community/entities/community.entity';
 import { Lesson } from '../../lesson/entities/lesson.entity';
 import { Quiz } from '../../quiz/entities/quiz.entity';
 import { UserModuleProgress } from '../../user-module-progress/entities/user-module-progress.entity';
+import { ModuleState } from '../types/state.enum';
 
 @Entity('module')
 export class Module {
@@ -15,6 +16,9 @@ export class Module {
 
   @Column({ nullable: true })
   description: string;
+
+  @Column({ nullable: false, default: ModuleState.NOT_VERIFIED })
+  state: string;
 
   @CreateDateColumn({
     name: 'registeredDate',
