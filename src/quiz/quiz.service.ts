@@ -56,8 +56,8 @@ export class QuizService {
     await this.quizRepository.remove(quiz);
   }
 
-  async findByModule(moduleId: string): Promise<Quiz[]> {
-    return await this.quizRepository.find({
+  async findByModule(moduleId: string): Promise<Quiz | null> {
+    return await this.quizRepository.findOne({
       where: { module: { id: moduleId } },
       relations: ['module', 'questions', 'attempts'],
     });

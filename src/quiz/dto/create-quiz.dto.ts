@@ -17,11 +17,6 @@ export class CreateQuizDto {
   @IsNumber()
   passingScore: number;
 
-  @ApiProperty({ description: 'Time to respond in minutes' })
-  @IsNotEmpty()
-  @IsNumber()
-  responseTime: number;
-
   @ApiProperty({ description: 'Module ID' })
   @IsNotEmpty()
   @IsUUID()

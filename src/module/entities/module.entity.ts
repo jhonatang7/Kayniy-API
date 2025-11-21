@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne, CreateDateColumn } from 'typeorm';
 import { Course } from '../../course/entities/course.entity';
 import { Community } from '../../community/entities/community.entity';
 import { Lesson } from '../../lesson/entities/lesson.entity';
@@ -36,8 +36,8 @@ export class Module {
   @OneToMany(() => Lesson, lesson => lesson.module)
   lessons: Lesson[];
 
-  @OneToMany(() => Quiz, quiz => quiz.module)
-  quizzes: Quiz[];
+  @OneToOne(() => Quiz, quiz => quiz.module)
+  quiz: Quiz;
 
   @OneToMany(() => UserModuleProgress, progress => progress.module)
   userProgress: UserModuleProgress[];

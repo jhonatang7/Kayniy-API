@@ -40,8 +40,8 @@ export class QuizController {
     return this.quizService.remove(id);
   }
 
-  @Get('module/:moduleId')
-  @ApiOperation({ summary: 'Get quizzes by module' })
+  @Get('find-by-module/:moduleId')
+  @ApiOperation({ summary: 'Get quiz by module' })
   findByModule(@Param('moduleId') moduleId: string) {
     return this.quizService.findByModule(moduleId);
   }
