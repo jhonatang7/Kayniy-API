@@ -1,11 +1,16 @@
-import { IsNotEmpty, IsString, IsOptional, IsUUID, IsNumber, IsEnum } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsUUID,
+  IsNumber,
+  IsEnum,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export enum LessonType {
-  VIDEO = 'video',
-  DOCUMENT = 'document',
-  PRESENTATION = 'presentation',
-  INTERACTIVE = 'interactive'
+  VIDEO = 'VIDEO',
+  DOCUMENT = 'DOCUMENT',
 }
 
 export class CreateLessonDto {

@@ -12,8 +12,9 @@ export class LessonService {
     private readonly lessonRepository: Repository<Lesson>,
   ) {}
 
-  async create(createLessonDto: CreateLessonDto): Promise<Lesson> {
+  async create(createLessonDto: CreateLessonDto, id: string): Promise<Lesson> {
     const lesson = this.lessonRepository.create({
+      id: id,
       title: createLessonDto.title,
       description: createLessonDto.description,
       urlContent: createLessonDto.urlContent,
@@ -63,7 +64,7 @@ export class LessonService {
   async findByModule(moduleId: string): Promise<Lesson[]> {
     return await this.lessonRepository.find({
       where: { module: { id: moduleId } },
-      relations: ['module', 'userProgress'],
+      relations: ['module'],
     });
   }
 

@@ -20,6 +20,9 @@ export class Question {
   @Column({ type: 'integer', nullable: false })
   order: number;
 
+  @Column({ type: 'integer', nullable: false })
+  points: number;
+
   @ManyToOne(() => Quiz, quiz => quiz.questions, { onDelete: 'CASCADE' })
   quiz: Quiz;
 

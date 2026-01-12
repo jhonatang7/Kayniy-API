@@ -15,7 +15,6 @@ export class OptionService {
   async create(createOptionDto: CreateOptionDto): Promise<Option> {
     const option = this.optionRepository.create({
       ...createOptionDto,
-      question: { id: createOptionDto.questionId },
     });
 
     return await this.optionRepository.save(option);
@@ -25,7 +24,6 @@ export class OptionService {
     const optionEntities = options.map(dto =>
       this.optionRepository.create({
         ...dto,
-        question: { id: dto.questionId },
       }),
     );
 
@@ -53,10 +51,6 @@ export class OptionService {
 
   async update(id: string, updateOptionDto: UpdateOptionDto): Promise<Option> {
     const option = await this.findOne(id);
-
-    if (updateOptionDto.questionId) {
-      option.question = { id: updateOptionDto.questionId } as any;
-    }
 
     Object.assign(option, updateOptionDto);
     return await this.optionRepository.save(option);
