@@ -11,9 +11,4 @@ export class CreateOptionDto {
   @IsNotEmpty()
   @IsBoolean()
   isCorrect: boolean;
-
-  @ApiProperty({ description: 'Question ID' })
-  @IsNotEmpty()
-  @IsUUID()
-  questionId: string;
 }
