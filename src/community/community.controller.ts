@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { CommunityService } from './community.service';
 import { CreateCommunityDto } from './dto/create-community.dto';
 import { UpdateCommunityDto } from './dto/update-community.dto';
@@ -11,7 +19,10 @@ export class CommunityController {
 
   @Post()
   @ApiOperation({ summary: 'Create community' })
-  @ApiResponse({ status: 201, description: 'The community has been successfully created.' })
+  @ApiResponse({
+    status: 201,
+    description: 'The community has been successfully created.',
+  })
   create(@Body() createCommunityDto: CreateCommunityDto) {
     return this.communityService.create(createCommunityDto);
   }
@@ -30,7 +41,10 @@ export class CommunityController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update community' })
-  update(@Param('id') id: string, @Body() updateCommunityDto: UpdateCommunityDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateCommunityDto: UpdateCommunityDto,
+  ) {
     return this.communityService.update(id, updateCommunityDto);
   }
 
@@ -40,6 +54,7 @@ export class CommunityController {
     return this.communityService.remove(id);
   }
 
+  /*
   @Post(':id/professors/:professorId')
   @ApiOperation({ summary: 'Add professor to community' })
   addProfessor(@Param('id') id: string, @Param('professorId') professorId: string) {
@@ -50,5 +65,5 @@ export class CommunityController {
   @ApiOperation({ summary: 'Add student to community' })
   addStudent(@Param('id') id: string, @Param('studentId') studentId: string) {
     return this.communityService.addStudent(id, studentId);
-  }
+  }*/
 }

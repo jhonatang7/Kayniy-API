@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, CreateDateColumn, ManyToMany, JoinTable } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+  CreateDateColumn,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
 import { Role } from '../../role/entities/role.entity';
 import { Community } from '../../community/entities/community.entity';
 import { Course } from '../../course/entities/course.entity';
@@ -7,6 +16,7 @@ import { Notification } from '../../notification/entities/notification.entity';
 import { UserProgress } from '../../user-progress/entities/user-progress.entity';
 import { UserModuleProgress } from '../../user-module-progress/entities/user-module-progress.entity';
 import { UserQuizAttempt } from '../../user-quiz-attempt/entities/user-quiz-attempt.entity';
+import { CommunityMember } from 'src/community-member/entities/community-member.entity';
 
 @Entity('user')
 export class User {
@@ -43,49 +53,24 @@ export class User {
   @ManyToOne(() => Role, { onDelete: 'SET NULL' })
   role: Role;
 
-  @OneToMany(() => Course, course => course.user)
+  @OneToMany(() => Course, (course) => course.user)
   courses: Course[];
 
-  @OneToMany(() => LiveClass, liveClass => liveClass.professor)
+  @OneToMany(() => LiveClass, (liveClass) => liveClass.professor)
   liveClasses: LiveClass[];
 
-  @OneToMany(() => Notification, notification => notification.user)
+  @OneToMany(() => Notification, (notification) => notification.user)
   notifications: Notification[];
 
-  @OneToMany(() => UserProgress, progress => progress.user)
+  @OneToMany(() => UserProgress, (progress) => progress.user)
   progress: UserProgress[];
 
-  @OneToMany(() => UserModuleProgress, progress => progress.user)
+  @OneToMany(() => UserModuleProgress, (progress) => progress.user)
   moduleProgress: UserModuleProgress[];
 
-  @OneToMany(() => UserQuizAttempt, attempt => attempt.user)
+  @OneToMany(() => UserQuizAttempt, (attempt) => attempt.user)
   quizAttempts: UserQuizAttempt[];
 
-  @ManyToMany(() => Community, community => community.professors)
-  @JoinTable({
-    name: 'community_professors',
-    joinColumn: {
-      name: 'professorID',
-      referencedColumnName: 'id'
-    },
-    inverseJoinColumn: {
-      name: 'communityID',
-      referencedColumnName: 'id'
-    }
-  })
-  teachingCommunities: Community[];
-
-  @ManyToMany(() => Community, community => community.students)
-  @JoinTable({
-    name: 'community_students',
-    joinColumn: {
-      name: 'studentID',
-      referencedColumnName: 'id'
-    },
-    inverseJoinColumn: {
-      name: 'communityID',
-      referencedColumnName: 'id'
-    }
-  })
-  enrolledCommunities: Community[];
+  @OneToMany(() => CommunityMember, (communityMember) => communityMember.user)
+  communityMemberships: CommunityMember[];
 }

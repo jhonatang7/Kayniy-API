@@ -19,14 +19,14 @@ export class CommunityService {
 
   async findAll(): Promise<Community[]> {
     return await this.communityRepository.find({
-      relations: ['professors', 'students', 'courses', 'modules', 'liveClasses'],
+      relations: ['members', 'courses', 'modules', 'liveClasses'],
     });
   }
 
   async findOne(id: string): Promise<Community> {
     const community = await this.communityRepository.findOne({
       where: { id },
-      relations: ['professors', 'students', 'courses', 'modules', 'liveClasses'],
+      relations: ['members', 'courses', 'modules', 'liveClasses'],
     });
 
     if (!community) {
@@ -36,7 +36,10 @@ export class CommunityService {
     return community;
   }
 
-  async update(id: string, updateCommunityDto: UpdateCommunityDto): Promise<Community> {
+  async update(
+    id: string,
+    updateCommunityDto: UpdateCommunityDto,
+  ): Promise<Community> {
     const community = await this.findOne(id);
     Object.assign(community, updateCommunityDto);
     return await this.communityRepository.save(community);
@@ -44,9 +47,10 @@ export class CommunityService {
 
   async remove(id: string): Promise<void> {
     const community = await this.findOne(id);
-    await this.communityRepository.remove(community);
+    await this.communityRepository.softDelete(community.id);
   }
 
+  /*
   async addProfessor(communityId: string, professorId: string): Promise<Community> {
     const community = await this.findOne(communityId);
     community.professors = [...(community.professors || []), { id: professorId }] as any;
@@ -57,5 +61,5 @@ export class CommunityService {
     const community = await this.findOne(communityId);
     community.students = [...(community.students || []), { id: studentId }] as any;
     return await this.communityRepository.save(community);
-  }
+  }*/
 }

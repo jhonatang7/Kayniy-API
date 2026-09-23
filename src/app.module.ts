@@ -20,6 +20,7 @@ import { RoleModule } from './role/role.module';
 import { PermissionModule } from './permission/permission.module';
 import { AuthModule } from './auth/auth.module';
 import { CommunityModule } from './community/community.module';
+import { CommunityMemberModule } from './community-member/community-member.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { CommunityModule } from './community/community.module';
     PermissionModule,
     AuthModule,
     CommunityModule,
+    CommunityMemberModule,
   ],
   controllers: [AppController],
   providers: [AppService],

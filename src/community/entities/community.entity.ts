@@ -1,8 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, CreateDateColumn, ManyToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, DeleteDateColumn } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Course } from '../../course/entities/course.entity';
 import { Module } from '../../module/entities/module.entity';
 import { LiveClass } from '../../live-class/entities/live-class.entity';
+import { CommunityMember } from 'src/community-member/entities/community-member.entity';
 
 @Entity('community')
 export class Community {
@@ -22,6 +23,9 @@ export class Community {
   })
   registeredDate: Date;
 
+  @DeleteDateColumn({ name: 'deletedAt', type: 'timestamp', nullable: true })
+  deletedAt: Date | null;
+
   @OneToMany(() => Course, course => course.community)
   courses: Course[];
 
@@ -31,9 +35,6 @@ export class Community {
   @OneToMany(() => LiveClass, liveClass => liveClass.community)
   liveClasses: LiveClass[];
 
-  @ManyToMany(() => User, user => user.teachingCommunities)
-  professors: User[];
-
-  @ManyToMany(() => User, user => user.enrolledCommunities)
-  students: User[];
+  @OneToMany(() => CommunityMember, (communityMember) => communityMember.community)
+  members: CommunityMember[];
 }

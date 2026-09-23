@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 
 @ApiTags('users')
 @Controller('users')
@@ -21,6 +21,13 @@ export class UserController {
   @ApiOperation({ summary: 'Get all users' })
   findAll() {
     return this.userService.findAll();
+  }
+
+  @Get('role/:role')
+  @ApiOperation({ summary: 'Get users by role' })
+  @ApiParam({ name: 'role', enum: ['teacher', 'student'] })
+  findByRole(@Param('role') role: string) {
+    return this.userService.findByRole(role);
   }
 
   @Get(':id')
