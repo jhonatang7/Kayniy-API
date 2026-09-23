@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -35,6 +35,22 @@ export class UserService {
     return await this.userRepository.find({
       relations: ['role', 'courses', 'liveClasses'],
       where: { isDeleted: false },
+    });
+  }
+
+  async findByRole(role: string): Promise<User[]> {
+    const normalizedRole = role.toLowerCase();
+    const allowedRoles = ['teacher', 'student'];
+
+    if (!allowedRoles.includes(normalizedRole)) {
+      throw new BadRequestException('Role must be teacher or student');
+    }
+
+    return await this.userRepository.find({
+      where: {
+        isDeleted: false,
+        role: { name: normalizedRole },
+      },
     });
   }
 
