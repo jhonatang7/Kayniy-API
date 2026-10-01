@@ -22,7 +22,8 @@ BEGIN
         "phoneNumber",
         "avatarPath",
         "rolId",
-        "isDeleted"
+        "isDeleted",
+        "isFirstLogin"
     ) VALUES (
         'Jhonatan',
         'Peñaranda',
@@ -30,8 +31,9 @@ BEGIN
         -- Contraseña: Admin123. (hasheada con bcrypt)
         '$2a$12$HkDIIO3miLOE5PGOhrPFQueNqOriedwu5qzIcdAI1vdNp4G6pKWNC',
         63924440,
-        NULL,
+        'https://www.gravatar.com/avatar/567792c0ecf98fbb1488ec7e43389278?f=y&d=retro',
         super_admin_role_id,
+        FALSE,
         FALSE
     );
 END $$;

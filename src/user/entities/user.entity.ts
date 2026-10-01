@@ -36,7 +36,7 @@ export class User {
   password: string;
 
   @Column({ nullable: false })
-  phoneNumber: number;
+  phoneNumber: string;
 
   @Column({ nullable: true })
   avatarPath: string;
@@ -46,6 +46,9 @@ export class User {
 
   @Column({ nullable: false })
   isDeleted: boolean;
+
+  @Column({ default: true })
+  isFirstLogin: boolean;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   registerDate: Date;
