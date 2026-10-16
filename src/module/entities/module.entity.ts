@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne, CreateDateColumn } from 'typeorm';
-import { Course } from '../../course/entities/course.entity';
+import { CourseModule } from '../../course-module/entities/course-module.entity';
 import { Community } from '../../community/entities/community.entity';
 import { Lesson } from '../../lesson/entities/lesson.entity';
 import { Quiz } from '../../quiz/entities/quiz.entity';
@@ -27,8 +27,8 @@ export class Module {
   })
   registeredDate: Date;
 
-  @ManyToOne(() => Course, course => course.modules, { onDelete: 'CASCADE' })
-  course: Course;
+  @OneToMany(() => CourseModule, courseModule => courseModule.module)
+  courseModules: CourseModule[];
 
   @ManyToOne(() => Community, community => community.modules)
   community: Community;

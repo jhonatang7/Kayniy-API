@@ -1,9 +1,18 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { UserService } from '../user/user.service';
+import { CommunityMember } from '../community-member/entities/community-member.entity';
 import { LoginDto } from './dto/login.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import * as bcrypt from 'bcrypt';
+
+interface PasswordRecoveryPayload {
+  sub: string;
+  type: 'password_recovery';
+}
 
 @Injectable()
 export class AuthService {
@@ -11,6 +20,8 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    @InjectRepository(CommunityMember)
+    private readonly communityMemberRepository: Repository<CommunityMember>,
   ) {}
 
   async login(loginDto: LoginDto) {
@@ -39,6 +50,11 @@ export class AuthService {
       refreshToken: hashedRefreshToken,
     });
 
+    const communityMember = await this.communityMemberRepository.findOne({
+      where: { user: { id: user.id } },
+      relations: ['community'],
+    });
+
     return {
       access_token: accessToken,
       refresh_token: refreshToken,
@@ -49,6 +65,12 @@ export class AuthService {
         lastName: user.lastName,
         role: user.role,
         isFirstLogin: user.isFirstLogin,
+        community: communityMember
+          ? {
+              id: communityMember.community.id,
+              name: communityMember.community.name,
+            }
+          : null,
       },
     };
   }
@@ -59,8 +81,21 @@ export class AuthService {
       throw new UnauthorizedException('Usuario no encontrado');
     }
 
+    const communityMember = await this.communityMemberRepository.findOne({
+      where: { user: { id: user.id } },
+      relations: ['community'],
+    });
+
     delete user.password;
-    return user;
+    return {
+      ...user,
+      community: communityMember
+        ? {
+            id: communityMember.community.id,
+            name: communityMember.community.name,
+          }
+        : null,
+    };
   }
 
   private async generateAccessToken(user: any) {
@@ -118,5 +153,44 @@ export class AuthService {
     return {
       message: 'Logout exitoso',
     };
+  }
+
+  async recoverPassword(email: string) {
+    const user = await this.userService.findByEmail(email);
+    const recoveryToken = await this.jwtService.signAsync(
+      {
+        sub: user.id,
+        type: 'password_recovery',
+      },
+      { expiresIn: '30m' },
+    );
+    const resetBaseUrl =
+      this.configService.get<string>('PASSWORD_RESET_URL') ??
+      'https://lumenia.world/reset-password';
+    const resetUrl = `${resetBaseUrl}?token=${encodeURIComponent(recoveryToken)}`;
+
+    await this.userService.sendPasswordRecoveryEmail(user, resetUrl);
+
+    return { message: 'Se envió un enlace de recuperación al correo registrado' };
+  }
+
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+    let payload: PasswordRecoveryPayload;
+
+    try {
+      payload = await this.jwtService.verifyAsync<PasswordRecoveryPayload>(
+        resetPasswordDto.token,
+        { secret: this.configService.get<string>('JWT_SECRET') },
+      );
+    } catch {
+      throw new UnauthorizedException('El token de recuperación es inválido o expiró');
+    }
+
+    if (payload.type !== 'password_recovery' || !payload.sub) {
+      throw new UnauthorizedException('El token de recuperación es inválido');
+    }
+
+    await this.userService.resetPassword(payload.sub, resetPasswordDto.newPassword);
+    return { message: 'Contraseña restablecida correctamente' };
   }
 }

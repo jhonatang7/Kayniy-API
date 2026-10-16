@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
+import { ReorderCourseModulesDto } from './dto/reorder-course-modules.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @ApiTags('courses')
@@ -26,6 +27,12 @@ export class CourseController {
   @ApiOperation({ summary: 'Get course by id' })
   findOne(@Param('id') id: string) {
     return this.courseService.findOne(id);
+  }
+
+  @Patch('order')
+  @ApiOperation({ summary: 'Reorder course modules' })
+  reorderModules(@Body() reorderCourseModulesDto: ReorderCourseModulesDto) {
+    return this.courseService.reorderModules(reorderCourseModulesDto);
   }
 
   @Patch(':id')

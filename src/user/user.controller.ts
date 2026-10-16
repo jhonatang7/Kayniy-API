@@ -1,16 +1,58 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateTeacherProfileDto } from './dto/update-teacher-profile.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { FirstLoginPasswordDto } from './dto/first-login-password.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Request } from 'express';
 
 @ApiTags('users')
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Post('me/first-login-password')
+  @ApiOperation({ summary: 'Establecer contraseña después del primer inicio de sesión' })
+  setFirstLoginPassword(
+    @Req() req: Request,
+    @Body() firstLoginPasswordDto: FirstLoginPasswordDto,
+  ) {
+    return this.userService.setFirstLoginPassword(
+      req.user['id'],
+      firstLoginPasswordDto,
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Post('me/password')
+  @ApiOperation({ summary: 'Actualizar la contraseña del usuario' })
+  changePassword(
+    @Req() req: Request,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
+    return this.userService.changePassword(req.user['id'], changePasswordDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Patch('me/profile')
+  @ApiOperation({ summary: 'Actualizar nombre, apellido y teléfono del usuario' })
+  updateProfile(
+    @Req() req: Request,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ) {
+    return this.userService.updateProfile(req.user['id'], updateProfileDto);
+  }
 
   @Post()
   @ApiOperation({ summary: 'Create user' })

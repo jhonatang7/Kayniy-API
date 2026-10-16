@@ -7,6 +7,9 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateTeacherProfileDto } from './dto/update-teacher-profile.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { FirstLoginPasswordDto } from './dto/first-login-password.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import { Role } from '../role/entities/role.entity';
 import { EmailService } from '../email/email.service';
 import * as bcrypt from 'bcrypt';
@@ -187,13 +190,63 @@ export class UserService {
       }
     }
 
-    if (updateUserDto.password) {
-      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
-      user.isFirstLogin = false;
-    }
-
     Object.assign(user, updateUserDto);
     return await this.userRepository.save(user);
+  }
+
+  async setFirstLoginPassword(
+    id: string,
+    firstLoginPasswordDto: FirstLoginPasswordDto,
+  ) {
+    const user = await this.findOne(id);
+    user.password = await bcrypt.hash(firstLoginPasswordDto.newPassword, 10);
+    user.isFirstLogin = false;
+
+    const savedUser = await this.userRepository.save(user);
+    const { password, refreshToken, ...safeUser } = savedUser;
+    return safeUser;
+  }
+
+  async changePassword(id: string, changePasswordDto: ChangePasswordDto) {
+    const user = await this.findOne(id);
+    const isCurrentPasswordValid = await bcrypt.compare(
+      changePasswordDto.currentPassword,
+      user.password,
+    );
+
+    if (!isCurrentPasswordValid) {
+      throw new BadRequestException('La contraseña actual es incorrecta');
+    }
+
+    user.password = await bcrypt.hash(changePasswordDto.newPassword, 10);
+    user.isFirstLogin = false;
+    await this.userRepository.save(user);
+
+    return { message: 'Contraseña actualizada correctamente' };
+  }
+
+  async updateProfile(id: string, updateProfileDto: UpdateProfileDto) {
+    const user = await this.findOne(id);
+    Object.assign(user, updateProfileDto);
+
+    const savedUser = await this.userRepository.save(user);
+    const { password, refreshToken, ...safeUser } = savedUser;
+    return safeUser;
+  }
+
+  async resetPassword(id: string, newPassword: string) {
+    const user = await this.findOne(id);
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.isFirstLogin = false;
+    await this.userRepository.save(user);
+  }
+
+  async sendPasswordRecoveryEmail(user: User, resetUrl: string) {
+    await this.emailService.sendPasswordRecoveryEmail(
+      user.email,
+      user.firstName,
+      resetUrl,
+    );
   }
 
   async updateTeacherProfile(
