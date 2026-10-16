@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, CreateDateColumn } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Community } from '../../community/entities/community.entity';
-import { Module } from '../../module/entities/module.entity';
+import { CourseModule } from '../../course-module/entities/course-module.entity';
 
 @Entity('course')
 export class Course {
@@ -33,6 +33,6 @@ export class Course {
   @ManyToOne(() => Community, community => community.courses)
   community: Community;
 
-  @OneToMany(() => Module, module => module.course)
-  modules: Module[];
+  @OneToMany(() => CourseModule, courseModule => courseModule.course)
+  courseModules: CourseModule[];
 }

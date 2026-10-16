@@ -22,12 +22,6 @@ export class LiveClassController {
     return this.liveClassService.findAll();
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get live class by id' })
-  findOne(@Param('id') id: string) {
-    return this.liveClassService.findOne(id);
-  }
-
   @Patch(':id')
   @ApiOperation({ summary: 'Update live class' })
   update(@Param('id') id: string, @Body() updateLiveClassDto: UpdateLiveClassDto) {
@@ -50,5 +44,11 @@ export class LiveClassController {
   @ApiOperation({ summary: 'Get live classes by professor' })
   findByProfessor(@Param('professorId') professorId: string) {
     return this.liveClassService.findByProfessor(professorId);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get live class by id' })
+  findOne(@Param('id') id: string) {
+    return this.liveClassService.findOne(id);
   }
 }

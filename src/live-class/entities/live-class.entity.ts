@@ -16,8 +16,24 @@ export class LiveClass {
   @Column({ type: 'timestamp', nullable: false })
   startedDate: Date;
 
+  @Column({ type: 'integer', nullable: false })
+  duration: number;
+
+  @Column({ type: 'timestamp', nullable: false })
+  expiresAt: Date;
+
   @Column({ nullable: true })
   transmitionLink: string;
+
+  @Column({ default: false })
+  isDeleted: boolean;
+
+  @CreateDateColumn({
+    name: 'registeredDate',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  registeredDate: Date;
 
   @ManyToOne(() => Community, community => community.liveClasses, { onDelete: 'CASCADE' })
   community: Community;

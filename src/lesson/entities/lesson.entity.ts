@@ -19,6 +19,9 @@ export class Lesson {
   @Column({ type: 'integer', nullable: true })
   duration: number;
 
+  @Column({ type: 'integer', nullable: false })
+  order: number;
+
   @Column({ nullable: false })
   type: string;
   

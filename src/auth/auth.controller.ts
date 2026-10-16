@@ -18,11 +18,29 @@ import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { Request, Response } from 'express';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @ApiTags('Authenticacion')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @Post('forgot-password')
+  @ApiOperation({ summary: 'Enviar enlace de recuperación por correo' })
+  @ApiResponse({ status: 200, description: 'Enlace de recuperación enviado' })
+  @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
+  recoverPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    return this.authService.recoverPassword(forgotPasswordDto.email);
+  }
+
+  @Post('reset-password')
+  @ApiOperation({ summary: 'Restablecer contraseña usando un token de recuperación' })
+  @ApiResponse({ status: 200, description: 'Contraseña restablecida correctamente' })
+  @ApiResponse({ status: 401, description: 'Token inválido o expirado' })
+  resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.authService.resetPassword(resetPasswordDto);
+  }
 
   @Post('login')
   @ApiOperation({ summary: 'Iniciar sesión' })

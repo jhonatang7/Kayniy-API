@@ -5,7 +5,10 @@ import {
   IsUUID,
   IsNumber,
   IsEnum,
+  IsInt,
+  Min,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export enum LessonType {
@@ -33,6 +36,12 @@ export class CreateLessonDto {
   @IsOptional()
   @IsNumber()
   duration?: number;
+
+  @ApiProperty({ description: 'Lesson order within the module', minimum: 1 })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  order: number;
 
   @ApiProperty({ description: 'Lesson type', enum: LessonType })
   @IsNotEmpty()

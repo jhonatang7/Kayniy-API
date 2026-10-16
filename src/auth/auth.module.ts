@@ -7,9 +7,12 @@ import { AuthController } from './auth.controller';
 import { UserModule } from '../user/user.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { CommunityMember } from '../community-member/entities/community-member.entity';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([CommunityMember]),
     UserModule,
     PassportModule,
     JwtModule.registerAsync({

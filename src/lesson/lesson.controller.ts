@@ -16,6 +16,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { LessonService } from './lesson.service';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
+import { UpdateLessonOrderDto } from './dto/update-lesson-order.dto';
 import {
   ApiTags,
   ApiOperation,
@@ -26,6 +27,7 @@ import {
 import { CloudflareService } from '../cloudflare/cloudflare.service';
 import { LessonType } from './dto/create-lesson.dto';
 import { v4 as uuidv4 } from 'uuid';
+import 'multer';
 
 @ApiTags('lessons')
 @Controller('lessons')
@@ -51,6 +53,7 @@ export class LessonController {
         description: { type: 'string' },
         urlContent: { type: 'string' },
         duration: { type: 'number' },
+        order: { type: 'integer', minimum: 1 },
         type: { type: 'string', enum: ['VIDEO', 'DOCUMENT'] },
         moduleId: { type: 'string' },
         file: {
@@ -98,6 +101,13 @@ export class LessonController {
     return this.lessonService.findAll();
   }
 
+  @Patch('order')
+  @ApiOperation({ summary: 'Update lesson order within a module' })
+  @ApiBody({ type: UpdateLessonOrderDto })
+  updateOrder(@Body() updateLessonOrderDto: UpdateLessonOrderDto) {
+    return this.lessonService.updateOrder(updateLessonOrderDto);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get lesson by id' })
   findOne(@Param('id') id: string) {
@@ -116,6 +126,7 @@ export class LessonController {
         description: { type: 'string' },
         urlContent: { type: 'string' },
         duration: { type: 'number' },
+        order: { type: 'integer', minimum: 1 },
         type: { type: 'string', enum: ['VIDEO', 'DOCUMENT'] },
         moduleId: { type: 'string' },
         file: {

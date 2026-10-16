@@ -17,7 +17,10 @@ export class LiveClassService {
       title: createLiveClassDto.title,
       description: createLiveClassDto.description,
       startedDate: createLiveClassDto.startedDate,
+      duration: createLiveClassDto.duration,
+      expiresAt: createLiveClassDto.expiresAt,
       transmitionLink: createLiveClassDto.transmitionLink,
+      isDeleted: false,
       community: { id: createLiveClassDto.communityId },
       professor: { id: createLiveClassDto.professorId },
     });
@@ -27,13 +30,14 @@ export class LiveClassService {
 
   async findAll(): Promise<LiveClass[]> {
     return await this.liveClassRepository.find({
+      where: { isDeleted: false },
       relations: ['community', 'professor'],
     });
   }
 
   async findOne(id: string): Promise<LiveClass> {
     const liveClass = await this.liveClassRepository.findOne({
-      where: { id },
+      where: { id, isDeleted: false },
       relations: ['community', 'professor'],
     });
 
@@ -66,19 +70,20 @@ export class LiveClassService {
 
   async remove(id: string): Promise<void> {
     const liveClass = await this.findOne(id);
-    await this.liveClassRepository.remove(liveClass);
+    liveClass.isDeleted = true;
+    await this.liveClassRepository.save(liveClass);
   }
 
   async findByCommunity(communityId: string): Promise<LiveClass[]> {
     return await this.liveClassRepository.find({
-      where: { community: { id: communityId } },
+      where: { community: { id: communityId }, isDeleted: false },
       relations: ['community', 'professor'],
     });
   }
 
   async findByProfessor(professorId: string): Promise<LiveClass[]> {
     return await this.liveClassRepository.find({
-      where: { professor: { id: professorId } },
+      where: { professor: { id: professorId }, isDeleted: false },
       relations: ['community', 'professor'],
     });
   }

@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsOptional, IsUUID, IsDate } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsUUID, IsDate, IsInt, Min } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
@@ -18,6 +18,18 @@ export class CreateLiveClassDto {
   @IsDate()
   @Type(() => Date)
   startedDate: Date;
+
+  @ApiProperty({ description: 'Live class duration in minutes', minimum: 1 })
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  duration: number;
+
+  @ApiProperty({ description: 'Live class expiration date' })
+  @IsNotEmpty()
+  @IsDate()
+  @Type(() => Date)
+  expiresAt: Date;
 
   @ApiPropertyOptional({ description: 'Live class transmission link' })
   @IsOptional()

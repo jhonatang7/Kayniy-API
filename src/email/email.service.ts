@@ -34,6 +34,36 @@ export class EmailService {
     await this.sendWelcomeEmail(recipientEmail, firstName, temporaryPassword, 'administrador');
   }
 
+  async sendPasswordRecoveryEmail(
+    recipientEmail: string,
+    firstName: string,
+    resetUrl: string,
+  ): Promise<void> {
+    const { error } = await this.resend.emails.send({
+      from: this.fromEmail,
+      to: recipientEmail,
+      subject: 'Recuperación de contraseña de Kayniy',
+      text: [
+        `Hola ${firstName},`,
+        '',
+        'Se solicitó recuperar la contraseña de tu cuenta de Kayniy.',
+        `Restablece tu contraseña desde este enlace: ${resetUrl}`,
+        '',
+        'Este enlace expira en 30 minutos.',
+      ].join('\n'),
+      html: `
+        <p>Hola ${this.escapeHtml(firstName)},</p>
+        <p>Se solicitó recuperar la contraseña de tu cuenta de Kayniy.</p>
+        <p><a href="${this.escapeHtml(resetUrl)}">Restablecer contraseña</a></p>
+        <p>Este enlace expira en 30 minutos.</p>
+      `,
+    });
+
+    if (error) {
+      throw new InternalServerErrorException('Could not send password recovery email');
+    }
+  }
+
   private async sendWelcomeEmail(
     recipientEmail: string,
     firstName: string,

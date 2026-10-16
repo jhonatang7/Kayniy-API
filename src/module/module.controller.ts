@@ -22,6 +22,12 @@ export class ModuleController {
     return this.moduleService.findAll();
   }
 
+  @Get('community/all/:communityId')
+  @ApiOperation({ summary: 'Get all modules by community, regardless of state' })
+  findAllByCommunity(@Param('communityId') communityId: string) {
+    return this.moduleService.findAllByCommunity(communityId);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get module by id' })
   findOne(@Param('id') id: string) {

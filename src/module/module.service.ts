@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Module } from './entities/module.entity';
 import { CreateModuleDto } from './dto/create-module.dto';
 import { UpdateModuleDto } from './dto/update-module.dto';
+import { ModuleState } from './types/state.enum';
 
 @Injectable()
 export class ModuleService {
@@ -24,7 +25,7 @@ export class ModuleService {
 
   async findAll(): Promise<Module[]> {
     return await this.moduleRepository.find({
-      relations: ['course', 'community', 'lessons', 'quiz', 'userProgress'],
+      relations: ['courseModules', 'community', 'lessons', 'quiz', 'userProgress'],
       order:{
         title: "ASC"
       }
@@ -34,7 +35,7 @@ export class ModuleService {
   async findOne(id: string): Promise<Module> {
     const module = await this.moduleRepository.findOne({
       where: { id },
-      relations: ['course', 'community', 'lessons', 'quiz', 'userProgress'],
+      relations: ['courseModules', 'community', 'lessons', 'quiz', 'userProgress'],
     });
 
     if (!module) {
@@ -62,15 +63,23 @@ export class ModuleService {
 
   async findByCourse(courseId: string): Promise<Module[]> {
     return await this.moduleRepository.find({
-      where: { course: { id: courseId } },
-      relations: ['course', 'community', 'lessons', 'quiz'],
+      where: { courseModules: { course: { id: courseId } } },
+      relations: ['courseModules', 'community', 'lessons', 'quiz'],
+      order: { courseModules: { order: 'ASC' } },
     });
   }
 
   async findByCommunity(communityId: string): Promise<Module[]> {
     return await this.moduleRepository.find({
+      where: { community: { id: communityId }, state: ModuleState.VERIFIED },
+      relations: ['courseModules', 'community', 'lessons', 'quiz'],
+    });
+  }
+
+  async findAllByCommunity(communityId: string): Promise<Module[]> {
+    return await this.moduleRepository.find({
       where: { community: { id: communityId } },
-      relations: ['course', 'community', 'lessons', 'quiz'],
+      relations: ['courseModules', 'community', 'lessons', 'quiz'],
     });
   }
 }

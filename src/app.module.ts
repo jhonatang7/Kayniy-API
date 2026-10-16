@@ -22,6 +22,7 @@ import { AuthModule } from './auth/auth.module';
 import { CommunityModule } from './community/community.module';
 import { CommunityMemberModule } from './community-member/community-member.module';
 import { EmailModule } from './email/email.module';
+import { CourseModuleModule } from './course-module/course-module.module';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { EmailModule } from './email/email.module';
     CommunityModule,
     CommunityMemberModule,
     EmailModule,
+    CourseModuleModule,
   ],
   controllers: [AppController],
   providers: [AppService],
