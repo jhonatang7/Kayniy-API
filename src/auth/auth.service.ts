@@ -157,21 +157,41 @@ export class AuthService {
 
   async recoverPassword(email: string) {
     const user = await this.userService.findByEmail(email);
-    const recoveryToken = await this.jwtService.signAsync(
-      {
-        sub: user.id,
-        type: 'password_recovery',
-      },
-      { expiresIn: '30m' },
-    );
     const resetBaseUrl =
       this.configService.get<string>('PASSWORD_RESET_URL') ??
       'https://lumenia.world/reset-password';
-    const resetUrl = `${resetBaseUrl}?token=${encodeURIComponent(recoveryToken)}`;
+    const resetUrl = await this.createPasswordRecoveryUrl(user.id, resetBaseUrl);
 
     await this.userService.sendPasswordRecoveryEmail(user, resetUrl);
 
     return { message: 'Se envió un enlace de recuperación al correo registrado' };
+  }
+
+  async forgotPasswordMobile(email: string) {
+    const user = await this.userService.findByEmail(email);
+    const recoveryToken = await this.createPasswordRecoveryToken(user.id);
+
+    await this.userService.sendPasswordRecoveryTokenEmail(user, recoveryToken);
+
+    return {
+      message: 'Se envió un token de recuperación al correo registrado',
+    };
+  }
+
+  private async createPasswordRecoveryUrl(userId: string, baseUrl: string) {
+    const recoveryToken = await this.createPasswordRecoveryToken(userId);
+
+    return `${baseUrl}?token=${encodeURIComponent(recoveryToken)}`;
+  }
+
+  private async createPasswordRecoveryToken(userId: string) {
+    return this.jwtService.signAsync(
+      {
+        sub: userId,
+        type: 'password_recovery',
+      },
+      { expiresIn: '30m' },
+    );
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {

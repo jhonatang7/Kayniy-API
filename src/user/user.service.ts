@@ -6,6 +6,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { CreateAdminDto } from './dto/create-admin.dto';
+import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateTeacherProfileDto } from './dto/update-teacher-profile.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { FirstLoginPasswordDto } from './dto/first-login-password.dto';
@@ -118,6 +119,50 @@ export class UserService {
 
     const savedUser = await this.userRepository.save(user);
     await this.emailService.sendAdminWelcomeEmail(
+      savedUser.email,
+      savedUser.firstName,
+      temporaryPassword,
+    );
+
+    const { password, refreshToken, ...safeUser } = savedUser;
+
+    return {
+      user: safeUser,
+      temporaryPassword,
+    };
+  }
+
+  async createStudent(createStudentDto: CreateStudentDto) {
+    const existingUser = await this.userRepository.findOne({
+      where: { email: createStudentDto.email },
+    });
+
+    if (existingUser) {
+      throw new ConflictException('Email already exists');
+    }
+
+    const studentRole = await this.roleRepository.findOne({
+      where: { name: 'student' },
+    });
+
+    if (!studentRole) {
+      throw new NotFoundException('Student role not found');
+    }
+
+    const temporaryPassword = randomBytes(12).toString('base64url');
+    const hashedPassword = await bcrypt.hash(temporaryPassword, 12);
+
+    const user = this.userRepository.create({
+      ...createStudentDto,
+      password: hashedPassword,
+      avatarPath: this.generateRetroAvatarUrl(createStudentDto.email),
+      role: studentRole,
+      isFirstLogin: true,
+      isDeleted: false,
+    });
+
+    const savedUser = await this.userRepository.save(user);
+    await this.emailService.sendStudentWelcomeEmail(
       savedUser.email,
       savedUser.firstName,
       temporaryPassword,
@@ -246,6 +291,14 @@ export class UserService {
       user.email,
       user.firstName,
       resetUrl,
+    );
+  }
+
+  async sendPasswordRecoveryTokenEmail(user: User, recoveryToken: string) {
+    await this.emailService.sendPasswordRecoveryTokenEmail(
+      user.email,
+      user.firstName,
+      recoveryToken,
     );
   }
 
