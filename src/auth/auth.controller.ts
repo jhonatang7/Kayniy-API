@@ -34,6 +34,14 @@ export class AuthController {
     return this.authService.recoverPassword(forgotPasswordDto.email);
   }
 
+  @Post('forgot-password-mobile')
+  @ApiOperation({ summary: 'Enviar token de recuperación para la aplicación móvil' })
+  @ApiResponse({ status: 200, description: 'Token de recuperación móvil enviado' })
+  @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
+  forgotPasswordMobile(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    return this.authService.forgotPasswordMobile(forgotPasswordDto.email);
+  }
+
   @Post('reset-password')
   @ApiOperation({ summary: 'Restablecer contraseña usando un token de recuperación' })
   @ApiResponse({ status: 200, description: 'Contraseña restablecida correctamente' })

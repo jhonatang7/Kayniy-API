@@ -34,6 +34,14 @@ export class EmailService {
     await this.sendWelcomeEmail(recipientEmail, firstName, temporaryPassword, 'administrador');
   }
 
+  async sendStudentWelcomeEmail(
+    recipientEmail: string,
+    firstName: string,
+    temporaryPassword: string,
+  ): Promise<void> {
+    await this.sendWelcomeEmail(recipientEmail, firstName, temporaryPassword, 'estudiante');
+  }
+
   async sendPasswordRecoveryEmail(
     recipientEmail: string,
     firstName: string,
@@ -61,6 +69,39 @@ export class EmailService {
 
     if (error) {
       throw new InternalServerErrorException('Could not send password recovery email');
+    }
+  }
+
+  async sendPasswordRecoveryTokenEmail(
+    recipientEmail: string,
+    firstName: string,
+    recoveryToken: string,
+  ): Promise<void> {
+    const { error } = await this.resend.emails.send({
+      from: this.fromEmail,
+      to: recipientEmail,
+      subject: 'Token de recuperación de contraseña de Kayniy',
+      text: [
+        `Hola ${firstName},`,
+        '',
+        'Se solicitó recuperar la contraseña de tu cuenta de Kayniy desde la aplicación móvil.',
+        'Copia el siguiente token y pégalo en el formulario de recuperación de contraseña:',
+        '',
+        recoveryToken,
+        '',
+        'Este token expira en 30 minutos.',
+      ].join('\n'),
+      html: `
+        <p>Hola ${this.escapeHtml(firstName)},</p>
+        <p>Se solicitó recuperar la contraseña de tu cuenta de Kayniy desde la aplicación móvil.</p>
+        <p>Copia el siguiente token y pégalo en el formulario de recuperación de contraseña:</p>
+        <p><code>${this.escapeHtml(recoveryToken)}</code></p>
+        <p>Este token expira en 30 minutos.</p>
+      `,
+    });
+
+    if (error) {
+      throw new InternalServerErrorException('Could not send password recovery token email');
     }
   }
 

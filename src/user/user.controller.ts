@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { CreateAdminDto } from './dto/create-admin.dto';
+import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateTeacherProfileDto } from './dto/update-teacher-profile.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { FirstLoginPasswordDto } from './dto/first-login-password.dto';
@@ -76,6 +77,14 @@ export class UserController {
   @ApiResponse({ status: 409, description: 'Email already exists.' })
   createAdmin(@Body() createAdminDto: CreateAdminDto) {
     return this.userService.createAdmin(createAdminDto);
+  }
+
+  @Post('create-student')
+  @ApiOperation({ summary: 'Create student with a temporary password' })
+  @ApiResponse({ status: 201, description: 'The student has been successfully created.' })
+  @ApiResponse({ status: 409, description: 'Email already exists.' })
+  createStudent(@Body() createStudentDto: CreateStudentDto) {
+    return this.userService.createStudent(createStudentDto);
   }
 
   @Get()

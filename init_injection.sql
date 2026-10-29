@@ -21,7 +21,7 @@ BEGIN
         password,
         "phoneNumber",
         "avatarPath",
-        "rolId",
+        "roleId",
         "isDeleted",
         "isFirstLogin"
     ) VALUES (
