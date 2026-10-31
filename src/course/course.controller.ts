@@ -23,6 +23,20 @@ export class CourseController {
     return this.courseService.findAll();
   }
 
+  @Get('summary')
+  @ApiOperation({ summary: 'Get all courses with community and acronym' })
+  findAllWithSummary() {
+    return this.courseService.findAllWithSummary();
+  }
+
+  @Get(':id/details')
+  @ApiOperation({
+    summary: 'Get a course with modules, lessons and exams',
+  })
+  findOneWithDetails(@Param('id') id: string) {
+    return this.courseService.findOneWithDetails(id);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get course by id' })
   findOne(@Param('id') id: string) {

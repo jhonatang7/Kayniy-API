@@ -17,6 +17,7 @@ import { UserProgress } from '../../user-progress/entities/user-progress.entity'
 import { UserModuleProgress } from '../../user-module-progress/entities/user-module-progress.entity';
 import { UserQuizAttempt } from '../../user-quiz-attempt/entities/user-quiz-attempt.entity';
 import { CommunityMember } from 'src/community-member/entities/community-member.entity';
+import { CourseEnrollment } from '../../course_enrollment/entities/course-enrollment.entity';
 
 @Entity('user')
 export class User {
@@ -76,4 +77,7 @@ export class User {
 
   @OneToMany(() => CommunityMember, (communityMember) => communityMember.user)
   communityMemberships: CommunityMember[];
+
+  @OneToMany(() => CourseEnrollment, (enrollment) => enrollment.user)
+  courseEnrollments: CourseEnrollment[];
 }
