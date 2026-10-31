@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, CreateDat
 import { User } from '../../user/entities/user.entity';
 import { Community } from '../../community/entities/community.entity';
 import { CourseModule } from '../../course-module/entities/course-module.entity';
+import { CourseEnrollment } from '../../course_enrollment/entities/course-enrollment.entity';
 
 @Entity('course')
 export class Course {
@@ -35,4 +36,7 @@ export class Course {
 
   @OneToMany(() => CourseModule, courseModule => courseModule.course)
   courseModules: CourseModule[];
+
+  @OneToMany(() => CourseEnrollment, enrollment => enrollment.course)
+  enrollments: CourseEnrollment[];
 }

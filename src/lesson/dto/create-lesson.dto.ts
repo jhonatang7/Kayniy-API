@@ -34,6 +34,7 @@ export class CreateLessonDto {
 
   @ApiPropertyOptional({ description: 'Lesson duration in minutes' })
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   duration?: number;
 

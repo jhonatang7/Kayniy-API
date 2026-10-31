@@ -14,6 +14,9 @@ interface PasswordRecoveryPayload {
   type: 'password_recovery';
 }
 
+export const ADMIN_LOGIN_ROLES = ['superadmin', 'admin', 'teacher'] as const;
+export const MOBILE_LOGIN_ROLES = ['student'] as const;
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -24,17 +27,21 @@ export class AuthService {
     private readonly communityMemberRepository: Repository<CommunityMember>,
   ) {}
 
-  async login(loginDto: LoginDto) {
+  async login(
+    loginDto: LoginDto,
+    allowedRoles: readonly string[],
+  ) {
     const { email, password } = loginDto;
     const user = await this.userService.findByEmail(email);
 
-    if (!user) {
+    if (!user || !user.role?.name) {
       throw new UnauthorizedException('Credenciales incorrectas');
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
-    if (!isPasswordValid) {
+    const userRole = user.role.name.toLowerCase();
+    if (!isPasswordValid || !allowedRoles.includes(userRole)) {
       throw new UnauthorizedException('Credenciales incorrectas');
     }
 

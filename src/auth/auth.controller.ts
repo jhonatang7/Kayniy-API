@@ -20,6 +20,10 @@ import { Request, Response } from 'express';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import {
+  ADMIN_LOGIN_ROLES,
+  MOBILE_LOGIN_ROLES,
+} from './auth.service';
 
 @ApiTags('Authenticacion')
 @Controller('auth')
@@ -51,18 +55,47 @@ export class AuthController {
   }
 
   @Post('login')
-  @ApiOperation({ summary: 'Iniciar sesión' })
+  @ApiOperation({
+    summary: 'Iniciar sesión en la plataforma administrativa',
+    description: 'Acepta usuarios con rol superAdmin, admin o teacher.',
+  })
   @ApiResponse({
     status: 200,
     description: 'Retorna el token de acceso y la información del usuario',
   })
   @ApiResponse({ status: 401, description: 'Credenciales inválidas' })
-  async login(
+  async loginAdmin(
     @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const result = await this.authService.login(loginDto);
+    const result = await this.authService.login(loginDto, ADMIN_LOGIN_ROLES);
 
+    return this.setRefreshTokenCookie(response, result);
+  }
+
+  @Post('login-mobile')
+  @ApiOperation({
+    summary: 'Iniciar sesión en la aplicación móvil',
+    description: 'Acepta únicamente usuarios con rol student.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Retorna el token de acceso y la información del usuario',
+  })
+  @ApiResponse({ status: 401, description: 'Credenciales inválidas' })
+  async loginMobile(
+    @Body() loginDto: LoginDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const result = await this.authService.login(loginDto, MOBILE_LOGIN_ROLES);
+
+    return this.setRefreshTokenCookie(response, result);
+  }
+
+  private setRefreshTokenCookie(
+    response: Response,
+    result: { refresh_token: string; [key: string]: unknown },
+  ) {
     // Configurar la cookie del refresh token
     response.cookie('refresh_token', result.refresh_token, {
       httpOnly: true,

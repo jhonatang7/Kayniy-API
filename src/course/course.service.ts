@@ -99,6 +99,19 @@ export class CourseService {
     });
   }
 
+  async findAllWithSummary() {
+    const courses = await this.courseRepository.find({
+      where: { isDeleted: false },
+      relations: ['community'],
+    });
+
+    return courses.map(course => ({
+      ...course,
+      communityName: course.community?.name ?? null,
+      acronym: this.generateCourseAcronym(course.name),
+    }));
+  }
+
   async findOne(id: string): Promise<Course> {
     const course = await this.courseRepository.findOne({
       where: { id, isDeleted: false },
@@ -116,6 +129,49 @@ export class CourseService {
     }
 
     return course;
+  }
+
+  async findOneWithDetails(id: string) {
+    const course = await this.courseRepository.findOne({
+      where: { id, isDeleted: false },
+      relations: [
+        'community',
+        'courseModules',
+        'courseModules.module',
+        'courseModules.module.lessons',
+        'courseModules.module.quiz',
+      ],
+    });
+
+    if (!course) {
+      throw new NotFoundException(`Course with ID ${id} not found`);
+    }
+
+    const modules = [...(course.courseModules ?? [])]
+      .sort((first, second) => first.order - second.order)
+      .map(courseModule => ({
+        id: courseModule.module.id,
+        title: courseModule.module.title,
+        description: courseModule.module.description,
+        state: courseModule.module.state,
+        registeredDate: courseModule.module.registeredDate,
+        order: courseModule.order,
+        lessons: [...(courseModule.module.lessons ?? [])].sort(
+          (first, second) => first.order - second.order,
+        ),
+        exam: courseModule.module.quiz?.name ?? null,
+      }));
+
+    return {
+      ...course,
+      communityName: course.community?.name ?? null,
+      modules,
+      totalModules: modules.length,
+      totalLessons: modules.reduce(
+        (total, module) => total + module.lessons.length,
+        0,
+      ),
+    };
   }
 
   async update(id: string, updateCourseDto: UpdateCourseDto): Promise<Course> {
@@ -247,5 +303,23 @@ export class CourseService {
         'courseModules.module.lessons',
       ],
     });
+  }
+
+  private generateCourseAcronym(name: string): string {
+    const words = name
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .match(/[a-zA-Z0-9]+/g) ?? [];
+
+    if (words.length >= 2) {
+      return words
+        .slice(0, 3)
+        .map(word => word[0])
+        .join('')
+        .toUpperCase();
+    }
+
+    const acronym = words[0]?.slice(0, 3) ?? '';
+    return acronym.length === 1 ? acronym.repeat(2).toUpperCase() : acronym.toUpperCase();
   }
 }
