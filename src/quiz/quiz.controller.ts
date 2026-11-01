@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { QuizService } from './quiz.service';
 import { CreateQuizDto } from './dto/create-quiz.dto';
 import { UpdateQuizDto } from './dto/update-quiz.dto';
+import { ReviewQuizDto } from './dto/review-quiz.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @ApiTags('quizzes')
@@ -16,6 +17,12 @@ export class QuizController {
     return this.quizService.create(createQuizDto);
   }
 
+  @Post('review')
+  @ApiOperation({ summary: 'Review and save a quiz attempt' })
+  review(@Body() reviewQuizDto: ReviewQuizDto) {
+    return this.quizService.review(reviewQuizDto);
+  }
+
   @Get()
   @ApiOperation({ summary: 'Get all quizzes' })
   findAll() {
@@ -26,6 +33,12 @@ export class QuizController {
   @ApiOperation({ summary: 'Get quiz by id' })
   findOne(@Param('id') id: string) {
     return this.quizService.findOne(id);
+  }
+
+  @Get(':id/content')
+  @ApiOperation({ summary: 'Get Content of quiz by id' })
+  getContentQuiz(@Param('id') id: string) {
+    return this.quizService.getContentQuiz(id);
   }
 
   @Patch(':id')

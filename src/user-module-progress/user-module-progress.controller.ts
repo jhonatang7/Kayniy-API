@@ -1,7 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { Request } from 'express';
 import { UserModuleProgressService } from './user-module-progress.service';
 import { CreateUserModuleProgressDto } from './dto/create-user-module-progress.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { CompleteModuleDto } from './dto/complete-module.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('user-module-progress')
 @Controller('user-module-progress')
@@ -13,6 +26,23 @@ export class UserModuleProgressController {
   @ApiResponse({ status: 201, description: 'The progress has been successfully created.' })
   create(@Body() createDto: CreateUserModuleProgressDto) {
     return this.userModuleProgressService.create(createDto);
+  }
+
+  @Post('complete')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Complete a module after validating its content' })
+  @ApiResponse({
+    status: 201,
+    description: 'The module progress has been registered successfully.',
+  })
+  complete(
+    @Body() completeDto: CompleteModuleDto,
+    @Req() request: Request,
+  ) {
+    return this.userModuleProgressService.complete(
+      completeDto,
+      request.user['id'],
+    );
   }
 
   @Get()

@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { UserQuizAttempt } from './entities/user-quiz-attempt.entity';
 import { CreateUserQuizAttemptDto } from './dto/create-user-quiz-attempt.dto';
 import { UpdateUserQuizAttemptDto } from './dto/update-user-quiz-attempt.dto';
+import { CourseEnrollment } from '../course_enrollment/entities/course-enrollment.entity';
 
 @Injectable()
 export class UserQuizAttemptService {
@@ -17,6 +18,7 @@ export class UserQuizAttemptService {
       ...createUserQuizAttemptDto,
       user: { id: createUserQuizAttemptDto.userId },
       quiz: { id: createUserQuizAttemptDto.quizId },
+      courseEnrollment: { id: createUserQuizAttemptDto.courseEnrollmentId },
     });
 
     return await this.userQuizAttemptRepository.save(userQuizAttempt);
@@ -24,7 +26,7 @@ export class UserQuizAttemptService {
 
   async findAll(): Promise<UserQuizAttempt[]> {
     return await this.userQuizAttemptRepository.find({
-      relations: ['user', 'quiz', 'answers'],
+      relations: ['user', 'quiz', 'answers', 'courseEnrollment'],
       order: { attemptDate: 'DESC' },
     });
   }
@@ -32,7 +34,7 @@ export class UserQuizAttemptService {
   async findOne(id: string): Promise<UserQuizAttempt> {
     const attempt = await this.userQuizAttemptRepository.findOne({
       where: { id },
-      relations: ['user', 'quiz', 'answers'],
+      relations: ['user', 'quiz', 'answers', 'courseEnrollment'],
     });
 
     if (!attempt) {
@@ -52,6 +54,11 @@ export class UserQuizAttemptService {
     if (updateUserQuizAttemptDto.quizId) {
       attempt.quiz = { id: updateUserQuizAttemptDto.quizId } as any;
     }
+    if (updateUserQuizAttemptDto.courseEnrollmentId) {
+      attempt.courseEnrollment = {
+        id: updateUserQuizAttemptDto.courseEnrollmentId,
+      } as CourseEnrollment;
+    }
 
     Object.assign(attempt, updateUserQuizAttemptDto);
     return await this.userQuizAttemptRepository.save(attempt);
@@ -65,7 +72,7 @@ export class UserQuizAttemptService {
   async findByUser(userId: string): Promise<UserQuizAttempt[]> {
     return await this.userQuizAttemptRepository.find({
       where: { user: { id: userId } },
-      relations: ['quiz', 'answers'],
+      relations: ['quiz', 'answers', 'courseEnrollment'],
       order: { attemptDate: 'DESC' },
     });
   }
@@ -73,9 +80,40 @@ export class UserQuizAttemptService {
   async findByQuiz(quizId: string): Promise<UserQuizAttempt[]> {
     return await this.userQuizAttemptRepository.find({
       where: { quiz: { id: quizId } },
-      relations: ['user', 'answers'],
+      relations: ['user', 'answers', 'courseEnrollment'],
       order: { attemptDate: 'DESC' },
     });
+  }
+
+  async getLatest(
+    quizId: string,
+    courseEnrollmentId: string,
+    userId: string,
+  ): Promise<{
+    id: string;
+    scoreGotten: number;
+    aprobed: boolean;
+    attemptDate: Date;
+  } | null> {
+    const attempt = await this.userQuizAttemptRepository.findOne({
+      where: {
+        user: { id: userId },
+        quiz: { id: quizId },
+        courseEnrollment: { id: courseEnrollmentId },
+      },
+      order: { attemptDate: 'DESC' },
+    });
+
+    if (!attempt) {
+      return null;
+    }
+
+    return {
+      id: attempt.id,
+      scoreGotten: Number(attempt.scoreGotten),
+      aprobed: attempt.aprobed,
+      attemptDate: attempt.attemptDate,
+    };
   }
 
   async getUserQuizStatistics(userId: string, quizId: string): Promise<any> {

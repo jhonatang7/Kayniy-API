@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Module } from '../../module/entities/module.entity';
+import { CourseEnrollment } from '../../course_enrollment/entities/course-enrollment.entity';
 
 @Entity('user_module_progress')
 export class UserModuleProgress {
@@ -15,4 +16,7 @@ export class UserModuleProgress {
 
   @ManyToOne(() => Module, module => module.userProgress, { onDelete: 'CASCADE' })
   module: Module;
+
+  @ManyToOne(() => CourseEnrollment, { onDelete: 'CASCADE', nullable: false })
+  courseEnrollment: CourseEnrollment;
 }

@@ -12,6 +12,11 @@ export class CreateUserProgressDto {
   @IsUUID()
   lessonId: string;
 
+  @ApiProperty({ description: 'Course enrollment ID' })
+  @IsNotEmpty()
+  @IsUUID()
+  courseEnrollmentId: string;
+
   @ApiProperty({ description: 'Whether the lesson is completed' })
   @IsNotEmpty()
   @IsBoolean()

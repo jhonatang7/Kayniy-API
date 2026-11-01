@@ -48,6 +48,27 @@ export class LessonService {
     return lesson;
   }
 
+  async getContent(id: string): Promise<Lesson> {
+    const lesson = await this.lessonRepository.findOne({
+      where: { id },
+      select: [
+        'id',
+        'title',
+        'description',
+        'urlContent',
+        'duration',
+        'order',
+        'type',
+      ],
+    });
+
+    if (!lesson) {
+      throw new NotFoundException(`Lesson with ID ${id} not found`);
+    }
+
+    return lesson;
+  }
+
   async update(id: string, updateLessonDto: UpdateLessonDto): Promise<Lesson> {
     const lesson = await this.findOne(id);
 

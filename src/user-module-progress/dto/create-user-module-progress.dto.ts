@@ -12,6 +12,11 @@ export class CreateUserModuleProgressDto {
   @IsUUID()
   moduleId: string;
 
+  @ApiProperty({ description: 'Course enrollment ID' })
+  @IsNotEmpty()
+  @IsUUID()
+  courseEnrollmentId: string;
+
   @ApiProperty({ description: 'Whether the module is completed' })
   @IsNotEmpty()
   isCompleted: boolean;

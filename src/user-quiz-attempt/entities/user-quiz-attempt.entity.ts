@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, CreateDat
 import { User } from '../../user/entities/user.entity';
 import { Quiz } from '../../quiz/entities/quiz.entity';
 import { UserAnswer } from '../../user-answer/entities/user-answer.entity';
+import { CourseEnrollment } from '../../course_enrollment/entities/course-enrollment.entity';
 
 @Entity('user_quiz_attempts')
 export class UserQuizAttempt {
@@ -26,6 +27,9 @@ export class UserQuizAttempt {
 
   @ManyToOne(() => Quiz, quiz => quiz.attempts, { onDelete: 'CASCADE' })
   quiz: Quiz;
+
+  @ManyToOne(() => CourseEnrollment, { onDelete: 'CASCADE', nullable: false })
+  courseEnrollment: CourseEnrollment;
 
   @OneToMany(() => UserAnswer, answer => answer.attempt)
   answers: UserAnswer[];

@@ -6,11 +6,16 @@ import {
   Param,
   Patch,
   Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
+import { Request } from 'express';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CourseEnrollmentService } from './course-enrollment.service';
 import { CreateCourseEnrollmentDto } from './dto/create-course-enrollment.dto';
 import { UpdateCourseEnrollmentDto } from './dto/update-course-enrollment.dto';
+import { CompleteCourseEnrollmentDto } from './dto/complete-course-enrollment.dto';
 
 @ApiTags('course-enrollments')
 @Controller('course-enrollments')
@@ -23,6 +28,19 @@ export class CourseEnrollmentController {
   @ApiOperation({ summary: 'Enroll a user in a course' })
   create(@Body() createDto: CreateCourseEnrollmentDto) {
     return this.courseEnrollmentService.create(createDto);
+  }
+
+  @Post('complete')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Complete a course enrollment' })
+  complete(
+    @Body() completeDto: CompleteCourseEnrollmentDto,
+    @Req() request: Request,
+  ) {
+    return this.courseEnrollmentService.complete(
+      completeDto.courseEnrollmentId,
+      request.user['id'],
+    );
   }
 
   @Get()
@@ -56,6 +74,14 @@ export class CourseEnrollmentController {
   @ApiOperation({ summary: 'Get courses enrolled by a student with progress' })
   findMyCourses(@Param('userId') userId: string) {
     return this.courseEnrollmentService.findMyCourses(userId);
+  }
+
+  @Get(':id/content')
+  @ApiOperation({
+    summary: 'Get the enrolled course content with the student progress',
+  })
+  findContent(@Param('id') id: string) {
+    return this.courseEnrollmentService.findContent(id);
   }
 
   @Get(':id')
