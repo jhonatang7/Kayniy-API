@@ -6,6 +6,7 @@ import { CourseEnrollmentController } from './course-enrollment.controller';
 import { CourseEnrollmentService } from './course-enrollment.service';
 import { CourseEnrollment } from './entities/course-enrollment.entity';
 import { UserProgress } from '../user-progress/entities/user-progress.entity';
+import { UserModuleProgress } from '../user-module-progress/entities/user-module-progress.entity';
 import { UserQuizAttempt } from '../user-quiz-attempt/entities/user-quiz-attempt.entity';
 
 @Module({
@@ -14,6 +15,7 @@ import { UserQuizAttempt } from '../user-quiz-attempt/entities/user-quiz-attempt
       CourseEnrollment,
       User,
       Course,
+      UserModuleProgress,
       UserProgress,
       UserQuizAttempt,
     ]),

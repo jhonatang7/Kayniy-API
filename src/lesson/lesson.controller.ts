@@ -108,6 +108,12 @@ export class LessonController {
     return this.lessonService.updateOrder(updateLessonOrderDto);
   }
 
+  @Get(':id/content')
+  @ApiOperation({ summary: 'Get lesson content by id' })
+  getContent(@Param('id') id: string) {
+    return this.lessonService.getContent(id);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get lesson by id' })
   findOne(@Param('id') id: string) {

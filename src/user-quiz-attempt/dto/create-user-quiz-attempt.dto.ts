@@ -21,4 +21,9 @@ export class CreateUserQuizAttemptDto {
   @IsNotEmpty()
   @IsUUID()
   quizId: string;
+
+  @ApiProperty({ description: 'Course enrollment ID' })
+  @IsNotEmpty()
+  @IsUUID()
+  courseEnrollmentId: string;
 }

@@ -1,8 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { Request } from 'express';
 import { UserQuizAttemptService } from './user-quiz-attempt.service';
 import { CreateUserQuizAttemptDto } from './dto/create-user-quiz-attempt.dto';
 import { UpdateUserQuizAttemptDto } from './dto/update-user-quiz-attempt.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { GetLatestQuizAttemptDto } from './dto/get-latest-quiz-attempt.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('user-quiz-attempts')
 @Controller('user-quiz-attempts')
@@ -20,6 +34,20 @@ export class UserQuizAttemptController {
   @ApiOperation({ summary: 'Get all quiz attempts' })
   findAll() {
     return this.userQuizAttemptService.findAll();
+  }
+
+  @Get('latest')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Get the latest quiz attempt for an enrollment' })
+  getLatest(
+    @Query() query: GetLatestQuizAttemptDto,
+    @Req() request: Request,
+  ) {
+    return this.userQuizAttemptService.getLatest(
+      query.quizId,
+      query.courseEnrollmentId,
+      request.user['id'],
+    );
   }
 
   @Get(':id')
