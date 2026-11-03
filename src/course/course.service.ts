@@ -112,6 +112,16 @@ export class CourseService {
     }));
   }
 
+  async findRandom() {
+    return await this.courseRepository
+      .createQueryBuilder('course')
+      .leftJoinAndSelect('course.community', 'community')
+      .where('course.isDeleted = :isDeleted', { isDeleted: false })
+      .orderBy('RANDOM()')
+      .limit(5)
+      .getMany();
+  }
+
   async findOne(id: string): Promise<Course> {
     const course = await this.courseRepository.findOne({
       where: { id, isDeleted: false },

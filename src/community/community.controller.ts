@@ -39,6 +39,12 @@ export class CommunityController {
     return this.communityService.findOne(id);
   }
 
+  @Get(':id/details')
+  @ApiOperation({ summary: 'Get community with courses and professors' })
+  getOneCommunity(@Param('id') id: string) {
+    return this.communityService.getOneCommunity(id);
+  }
+
   @Patch(':id')
   @ApiOperation({ summary: 'Update community' })
   update(

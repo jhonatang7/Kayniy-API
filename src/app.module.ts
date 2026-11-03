@@ -24,6 +24,7 @@ import { CommunityMemberModule } from './community-member/community-member.modul
 import { EmailModule } from './email/email.module';
 import { CourseModuleModule } from './course-module/course-module.module';
 import { CourseEnrollmentModule } from './course_enrollment/course-enrollment.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { CourseEnrollmentModule } from './course_enrollment/course-enrollment.mo
     EmailModule,
     CourseModuleModule,
     CourseEnrollmentModule,
+    AnalyticsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
