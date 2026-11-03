@@ -36,6 +36,18 @@ export class CommunityService {
     return community;
   }
 
+  async getOneCommunity(id: string): Promise<Community> {
+    const community = await this.communityRepository.findOne({
+      where: { id }
+    });
+  
+    if (!community) {
+      throw new NotFoundException(`Community with ID ${id} not found`);
+    }
+
+    return community;
+  }
+
   async update(
     id: string,
     updateCommunityDto: UpdateCommunityDto,

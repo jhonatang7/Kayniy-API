@@ -29,6 +29,12 @@ export class CourseController {
     return this.courseService.findAllWithSummary();
   }
 
+  @Get('random')
+  @ApiOperation({ summary: 'Get five random courses with community name' })
+  findRandom() {
+    return this.courseService.findRandom();
+  }
+
   @Get(':id/details')
   @ApiOperation({
     summary: 'Get a course with modules, lessons and exams',

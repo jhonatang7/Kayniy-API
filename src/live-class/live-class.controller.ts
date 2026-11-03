@@ -40,6 +40,12 @@ export class LiveClassController {
     return this.liveClassService.findByCommunity(communityId);
   }
 
+  @Get('community/:communityId/mobile')
+  @ApiOperation({ summary: 'Get active community live classes for mobile' })
+  findByCommunityForMobile(@Param('communityId') communityId: string) {
+    return this.liveClassService.findByCommunityForMobile(communityId);
+  }
+
   @Get('professor/:professorId')
   @ApiOperation({ summary: 'Get live classes by professor' })
   findByProfessor(@Param('professorId') professorId: string) {

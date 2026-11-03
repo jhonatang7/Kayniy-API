@@ -81,10 +81,83 @@ export class LiveClassService {
     });
   }
 
+  async findByCommunityForMobile(communityId: string) {
+    const now = new Date();
+    const liveClasses = await this.liveClassRepository
+      .createQueryBuilder('liveClass')
+      .innerJoin('liveClass.community', 'community')
+      .where('community.id = :communityId', { communityId })
+      .andWhere('community.deletedAt IS NULL')
+      .andWhere('liveClass.isDeleted = :isDeleted', { isDeleted: false })
+      .andWhere('liveClass.expiresAt > :now', { now })
+      .orderBy('liveClass.startedDate', 'ASC')
+      .getMany();
+
+    return liveClasses.map(liveClass => ({
+      id: liveClass.id,
+      title: liveClass.title,
+      description: liveClass.description,
+      duration: this.formatDuration(liveClass.duration),
+      timeLife: this.formatTimeLife(liveClass.startedDate, liveClass.expiresAt),
+      status: now >= liveClass.startedDate ? 'IN_LIVE' : 'SOON',
+      transmitionLink: liveClass.transmitionLink,
+    }));
+  }
+
   async findByProfessor(professorId: string): Promise<LiveClass[]> {
     return await this.liveClassRepository.find({
       where: { professor: { id: professorId }, isDeleted: false },
       relations: ['community', 'professor'],
     });
+  }
+
+  private formatDuration(durationInMinutes: number): string {
+    const hours = Math.floor(durationInMinutes / 60);
+    const minutes = durationInMinutes % 60;
+    const parts: string[] = [];
+
+    if (hours > 0) {
+      parts.push(`${hours} ${hours === 1 ? 'hora' : 'horas'}`);
+    }
+
+    if (minutes > 0) {
+      parts.push(`${minutes} ${minutes === 1 ? 'minuto' : 'minutos'}`);
+    }
+
+    return parts.join(' ') || '0 minutos';
+  }
+
+  private formatTimeLife(startedDate: Date, expiresAt: Date): string {
+    const start = this.formatDateTime(startedDate);
+    const end = this.formatDateTime(expiresAt);
+    const sameDay = startedDate.toDateString() === expiresAt.toDateString();
+
+    return sameDay
+      ? `${start.date} a las ${start.time} hasta las ${end.time}`
+      : `${start.date} a las ${start.time} hasta el ${end.date} a las ${end.time}`;
+  }
+
+  private formatDateTime(date: Date): { date: string; time: string } {
+    const dateParts = new Intl.DateTimeFormat('es-ES', {
+      day: 'numeric',
+      month: 'long',
+    }).formatToParts(date);
+    const day = dateParts.find(part => part.type === 'day')?.value ?? '';
+    const month = dateParts.find(part => part.type === 'month')?.value ?? '';
+    const capitalizedMonth = month.charAt(0).toUpperCase() + month.slice(1);
+    const timeParts = new Intl.DateTimeFormat('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    }).formatToParts(date);
+    const hour = timeParts.find(part => part.type === 'hour')?.value ?? '';
+    const minute = timeParts.find(part => part.type === 'minute')?.value ?? '';
+    const period = timeParts.find(part => part.type === 'dayPeriod')?.value ?? '';
+    const time = `${hour}${minute === '00' ? '' : `:${minute}`}${period}`;
+
+    return {
+      date: `${day} de ${capitalizedMonth}`,
+      time,
+    };
   }
 }
