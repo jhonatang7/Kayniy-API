@@ -45,6 +45,23 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+### RAG / Gemini
+
+The API uses `gemini-embedding-001` (768 dimensions) to index educational content
+and `gemini-1.5-flash` to generate answers. Set `GEMINI_API_KEY` in the
+environment before starting the application. PostgreSQL must run from
+`docker-compose.yml`, which uses the pgvector image.
+
+After authenticating, use these endpoints:
+
+- `POST /api/ai/ingest`: extracts lessons and quiz questions, generates embeddings,
+  and upserts them into `meta.embeddings` by `source_id`.
+- `POST /api/ai/chat` requires the community context:
+  `{ "communityId": "<uuid>", "message": "¿Me explicas las métricas de cómo están mis cursos?" }`.
+  Gemini can call the professor analytics functions for quiz bottlenecks, student risk,
+  and learning activity, then combines those metrics with the retrieved educational
+  embeddings.
+
 ## Test
 
 ```bash

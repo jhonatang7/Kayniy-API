@@ -25,6 +25,7 @@ import { EmailModule } from './email/email.module';
 import { CourseModuleModule } from './course-module/course-module.module';
 import { CourseEnrollmentModule } from './course_enrollment/course-enrollment.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -67,6 +68,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
     CourseModuleModule,
     CourseEnrollmentModule,
     AnalyticsModule,
+    AiModule,
   ],
   controllers: [AppController],
   providers: [AppService],

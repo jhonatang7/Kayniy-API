@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   db:
-    image: postgres:16.4
+    image: pgvector/pgvector:pg16
     container_name: container_kayniy_bdd
     environment:
       POSTGRES_PASSWORD: admin
@@ -9,6 +9,7 @@ services:
       POSTGRES_DB: kayniy_bdd
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./init_pgvector.sql:/docker-entrypoint-initdb.d/01-pgvector.sql:ro
     ports:
       - '5432:5432'
 volumes:
