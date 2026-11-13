@@ -18,6 +18,7 @@ export class ModuleService {
       title: createModuleDto.title,
       description: createModuleDto.description,
       community: { id: createModuleDto.communityId },
+      state: ModuleState.NOT_VERIFIED,
     });
 
     return await this.moduleRepository.save(module);

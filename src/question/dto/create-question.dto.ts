@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsNumber, IsOptional, IsUUID, IsEnum, IsArray, ValidateNested, IsBoolean, ArrayMinSize } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, IsOptional, IsUUID, IsEnum, IsArray, ValidateNested, IsBoolean, ArrayMinSize, Min } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { CreateOptionDto } from 'src/option/dto/create-option.dto';
@@ -27,6 +27,7 @@ export class CreateQuestionDto {
   @ApiProperty({ description: 'Points for this question', minimum: 0 })
   @IsNotEmpty()
   @IsNumber()
+  @Min(1)
   points: number;
 
   @ApiProperty({ description: 'Quiz ID' })

@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsOptional, IsUUID, IsEnum, IsArray, ValidateNested, IsBoolean, ArrayMinSize, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsUUID, IsEnum, IsArray, ValidateNested, IsBoolean, ArrayMinSize, IsNumber, Min } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { QuestionType } from './create-question.dto';
@@ -39,6 +39,7 @@ export class UpdateQuestionDto {
   @ApiPropertyOptional({ description: 'Points for this question', minimum: 0 })
   @IsOptional()
   @IsNumber()
+  @Min(1)
   points?: number;
 
   @ApiPropertyOptional({ description: 'Quiz ID' })

@@ -1,10 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { LiveClassService } from './live-class.service';
 import { CreateLiveClassDto } from './dto/create-live-class.dto';
 import { UpdateLiveClassDto } from './dto/update-live-class.dto';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @ApiTags('live-classes')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('live-classes')
 export class LiveClassController {
   constructor(private readonly liveClassService: LiveClassService) {}

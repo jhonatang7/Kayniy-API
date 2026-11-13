@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Option } from './entities/option.entity';
@@ -21,6 +21,12 @@ export class OptionService {
   }
 
   async createMany(options: CreateOptionDto[]): Promise<Option[]> {
+    if (options.length < 2 || !options.some(option => option.isCorrect)) {
+      throw new BadRequestException(
+        'At least two options and one correct option are required',
+      );
+    }
+
     const optionEntities = options.map(dto =>
       this.optionRepository.create({
         ...dto,

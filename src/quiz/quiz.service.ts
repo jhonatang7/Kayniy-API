@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -24,6 +25,14 @@ export class QuizService {
   ) {}
 
   async create(createQuizDto: CreateQuizDto): Promise<Quiz> {
+    const existingQuiz = await this.quizRepository.findOne({
+      where: { module: { id: createQuizDto.moduleId } },
+    });
+
+    if (existingQuiz) {
+      throw new ConflictException('A final exam already exists for this module');
+    }
+
     const quiz = this.quizRepository.create({
       ...createQuizDto,
       module: { id: createQuizDto.moduleId },

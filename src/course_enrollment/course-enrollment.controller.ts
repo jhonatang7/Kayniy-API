@@ -11,13 +11,15 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CourseEnrollmentService } from './course-enrollment.service';
 import { CreateCourseEnrollmentDto } from './dto/create-course-enrollment.dto';
 import { UpdateCourseEnrollmentDto } from './dto/update-course-enrollment.dto';
 import { CompleteCourseEnrollmentDto } from './dto/complete-course-enrollment.dto';
 
 @ApiTags('course-enrollments')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('course-enrollments')
 export class CourseEnrollmentController {
   constructor(
@@ -31,7 +33,7 @@ export class CourseEnrollmentController {
   }
 
   @Post('complete')
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Complete a course enrollment' })
   complete(
     @Body() completeDto: CompleteCourseEnrollmentDto,

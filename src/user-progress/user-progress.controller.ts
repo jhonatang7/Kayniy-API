@@ -13,10 +13,12 @@ import { Request } from 'express';
 import { UserProgressService } from './user-progress.service';
 import { CreateUserProgressDto } from './dto/create-user-progress.dto';
 import { RegisterLessonProgressDto } from './dto/register-lesson-progress.dto';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('user-progress')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('user-progress')
 export class UserProgressController {
   constructor(private readonly userProgressService: UserProgressService) {}
@@ -29,7 +31,7 @@ export class UserProgressController {
   }
 
   @Post('lessons')
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Register a completed lesson for the authenticated user' })
   @ApiResponse({
     status: 201,

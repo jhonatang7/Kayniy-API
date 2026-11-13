@@ -1,10 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { CommunityMemberService } from './community-member.service';
 import { CreateCommunityMemberDto } from './dto/create-community-member.dto';
 import { UpdateCommunityMemberDto } from './dto/update-community-member.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @ApiTags('community-members')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('community-member')
 export class CommunityMemberController {
   constructor(private readonly communityMemberService: CommunityMemberService) {}

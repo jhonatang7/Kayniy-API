@@ -11,6 +11,7 @@ import {
   ParseFilePipe,
   MaxFileSizeValidator,
   FileTypeValidator,
+  UseGuards,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { LessonService } from './lesson.service';
@@ -23,13 +24,17 @@ import {
   ApiResponse,
   ApiConsumes,
   ApiBody,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { CloudflareService } from '../cloudflare/cloudflare.service';
 import { LessonType } from './dto/create-lesson.dto';
 import { v4 as uuidv4 } from 'uuid';
 import 'multer';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @ApiTags('lessons')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('lessons')
 export class LessonController {
   constructor(

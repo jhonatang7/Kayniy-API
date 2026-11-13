@@ -12,11 +12,13 @@ import {
 import { Request } from 'express';
 import { UserModuleProgressService } from './user-module-progress.service';
 import { CreateUserModuleProgressDto } from './dto/create-user-module-progress.dto';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { CompleteModuleDto } from './dto/complete-module.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('user-module-progress')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('user-module-progress')
 export class UserModuleProgressController {
   constructor(private readonly userModuleProgressService: UserModuleProgressService) {}
@@ -29,7 +31,7 @@ export class UserModuleProgressController {
   }
 
   @Post('complete')
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Complete a module after validating its content' })
   @ApiResponse({
     status: 201,
