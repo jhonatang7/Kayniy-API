@@ -14,11 +14,13 @@ import { Request } from 'express';
 import { UserQuizAttemptService } from './user-quiz-attempt.service';
 import { CreateUserQuizAttemptDto } from './dto/create-user-quiz-attempt.dto';
 import { UpdateUserQuizAttemptDto } from './dto/update-user-quiz-attempt.dto';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { GetLatestQuizAttemptDto } from './dto/get-latest-quiz-attempt.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('user-quiz-attempts')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('user-quiz-attempts')
 export class UserQuizAttemptController {
   constructor(private readonly userQuizAttemptService: UserQuizAttemptService) {}
@@ -37,7 +39,7 @@ export class UserQuizAttemptController {
   }
 
   @Get('latest')
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get the latest quiz attempt for an enrollment' })
   getLatest(
     @Query() query: GetLatestQuizAttemptDto,

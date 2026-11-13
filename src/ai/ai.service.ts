@@ -84,28 +84,37 @@ export class AiService {
   async ingest() {
     const records = await this.extractEducationalContent();
     const embeddingModel = this.getModel(EMBEDDING_MODEL);
+    let processed = 0;
 
     for (const record of records) {
-      const result = await this.embed(embeddingModel, record.content);
-      const values = result.embedding.values;
-      if (values.length !== EMBEDDING_DIMENSIONS) {
-        throw new InternalServerErrorException(
-          `El modelo de embeddings devolvió ${values.length} dimensiones; se esperaban ${EMBEDDING_DIMENSIONS}`,
+      try {
+        const result = await this.embed(embeddingModel, record.content);
+        const values = result.embedding.values;
+        if (values.length !== EMBEDDING_DIMENSIONS) {
+          throw new InternalServerErrorException(
+            `El modelo de embeddings devolvió ${values.length} dimensiones; se esperaban ${EMBEDDING_DIMENSIONS}`,
+          );
+        }
+
+        await this.embeddingRepository.upsert(
+          {
+            sourceId: record.sourceId,
+            content: record.content,
+            embedding: values,
+          },
+          ['sourceId'],
+        );
+        processed++;
+      } catch (error) {
+        console.error(
+          `No se pudo indexar el fragmento educativo ${record.sourceId}`,
+          error,
         );
       }
-
-      await this.embeddingRepository.upsert(
-        {
-          sourceId: record.sourceId,
-          content: record.content,
-          embedding: values,
-        },
-        ['sourceId'],
-      );
     }
 
     return {
-      processed: records.length,
+      processed,
       message: 'Contenido educativo indexado correctamente',
     };
   }
@@ -160,8 +169,11 @@ export class AiService {
         .filter((call): call is NonNullable<typeof call> => !!call) ?? [];
 
     if (functionCalls.length === 0) {
+      const answer = firstResponse.response.text();
       return {
-        answer: firstResponse.response.text(),
+        answer:
+          answer.trim() ||
+          'No tengo suficiente información para responder. Proporciona más contexto.',
         sources: context.map((item) => ({
           sourceId: item.source_id,
           distance: Number(item.distance),

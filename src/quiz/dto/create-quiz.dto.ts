@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsNumber, IsOptional, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, IsOptional, IsUUID, Min, Max } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateQuizDto {
@@ -15,6 +15,8 @@ export class CreateQuizDto {
   @ApiProperty({ description: 'Passing score (percentage)', minimum: 0, maximum: 100 })
   @IsNotEmpty()
   @IsNumber()
+  @Min(0)
+  @Max(100)
   passingScore: number;
 
   @ApiProperty({ description: 'Module ID' })

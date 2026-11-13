@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LiveClass } from './entities/live-class.entity';
@@ -13,6 +13,12 @@ export class LiveClassService {
   ) {}
 
   async create(createLiveClassDto: CreateLiveClassDto): Promise<LiveClass> {
+    if (createLiveClassDto.expiresAt <= createLiveClassDto.startedDate) {
+      throw new BadRequestException(
+        'The expiration date must be after the start date',
+      );
+    }
+
     const liveClass = this.liveClassRepository.create({
       title: createLiveClassDto.title,
       description: createLiveClassDto.description,
@@ -102,6 +108,27 @@ export class LiveClassService {
       status: now >= liveClass.startedDate ? 'IN_LIVE' : 'SOON',
       transmitionLink: liveClass.transmitionLink,
     }));
+  }
+
+  async findOneForMobile(id: string) {
+    const liveClass = await this.liveClassRepository.findOne({
+      where: { id, isDeleted: false },
+      relations: ['community', 'professor'],
+    });
+
+    if (!liveClass || liveClass.expiresAt <= new Date()) {
+      throw new NotFoundException(`Live class with ID ${id} is not available`);
+    }
+
+    return {
+      id: liveClass.id,
+      title: liveClass.title,
+      description: liveClass.description,
+      duration: this.formatDuration(liveClass.duration),
+      timeLife: this.formatTimeLife(liveClass.startedDate, liveClass.expiresAt),
+      status: new Date() >= liveClass.startedDate ? 'IN_LIVE' : 'SOON',
+      transmitionLink: liveClass.transmitionLink,
+    };
   }
 
   async findByProfessor(professorId: string): Promise<LiveClass[]> {

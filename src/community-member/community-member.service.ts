@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -50,8 +51,21 @@ export class CommunityMemberService {
         throw new NotFoundException('One or more users were not found');
       }
 
+      const existingMembers = await queryRunner.manager.find(CommunityMember, {
+        where: uniqueUserIds.map(userId => ({
+          user: { id: userId },
+        })),
+        relations: ['user'],
+      });
+      const existingUserIds = new Set(
+        existingMembers.map(member => member.user?.id).filter(Boolean),
+      );
+      const usersToAdd = users.filter(user => !existingUserIds.has(user.id));
+
       const expectedRole = communityRole === CommunityMemberType.TEACHER ? 'teacher' : 'student';
-      const invalidRoleUser = users.find(user => user.role?.name.toLowerCase() !== expectedRole);
+      const invalidRoleUser = usersToAdd.find(
+        user => user.role?.name.toLowerCase() !== expectedRole,
+      );
 
       if (invalidRoleUser) {
         throw new BadRequestException(
@@ -59,25 +73,25 @@ export class CommunityMemberService {
         );
       }
 
-      const existingMembers = await queryRunner.manager.find(CommunityMember, {
-        where: uniqueUserIds.map(userId => ({
-          community: { id: communityId },
-          user: { id: userId },
-        })),
-      });
+      if (usersToAdd.length === 0) {
+        if (uniqueUserIds.length === 1) {
+          throw new ConflictException(
+            'Este usuario ya pertenece a una comunidad',
+          );
+        }
 
-      if (existingMembers.length > 0) {
-        throw new ConflictException('One or more users are already members of this community');
+        await queryRunner.commitTransaction();
+        return [];
       }
 
-      const members = uniqueUserIds.map(userId =>
+      const members = usersToAdd.map(user =>
         queryRunner.manager.create(CommunityMember, {
           communityRole:
             communityRole === CommunityMemberType.TEACHER
               ? CommunityRole.TEACHER
               : CommunityRole.STUDENT,
           community,
-          user: { id: userId },
+          user: { id: user.id },
         }),
       );
 
@@ -109,6 +123,21 @@ export class CommunityMemberService {
       where: { community: { id: communityId } },
       relations: ['user'],
     });
+  }
+
+  async assertMember(communityId: string, userId: string): Promise<CommunityMember> {
+    const member = await this.communityMemberRepository.findOne({
+      where: { community: { id: communityId }, user: { id: userId } },
+      relations: ['community', 'user'],
+    });
+
+    if (!member) {
+      throw new ForbiddenException(
+        'The user is not an active member of this community',
+      );
+    }
+
+    return member;
   }
 
   async remove(id: string): Promise<void> {

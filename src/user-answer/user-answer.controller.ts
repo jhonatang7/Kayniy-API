@@ -1,10 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { UserAnswerService } from './user-answer.service';
 import { CreateUserAnswerDto } from './dto/create-user-answer.dto';
 import { UpdateUserAnswerDto } from './dto/update-user-answer.dto';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @ApiTags('user-answers')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('user-answers')
 export class UserAnswerController {
   constructor(private readonly userAnswerService: UserAnswerService) {}
